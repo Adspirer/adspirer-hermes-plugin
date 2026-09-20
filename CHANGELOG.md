@@ -4,7 +4,8 @@ All notable changes to this project will be documented in this file.
 
 ## 1.0.0 - 2026-09-19
 
-- Initial Hermes Agent distribution.
-- Add the Adspirer hosted Streamable HTTP MCP connection.
-- Add fourteen skills for campaign setup, analysis, optimization, creative work, and platform-specific operations.
+- Initial Hermes Agent distribution with fourteen paid-media workflow skills.
+- Add the Adspirer hosted MCP connection through pinned `mcp-remote@0.1.49` so portable installs can
+  complete OAuth until Agent Plugins v1 can carry remote OAuth configuration natively.
 - Add approval, paused-creation, verification, and destructive-action safeguards.
+- Add repository validation matching the Hermes catalog admission command.

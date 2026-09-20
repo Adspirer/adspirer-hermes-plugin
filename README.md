@@ -11,7 +11,6 @@ After the plugin is accepted into the Hermes catalog:
 ```bash
 hermes plugins install adspirer --no-enable
 hermes plugins enable adspirer
-hermes mcp login adspirer
 ```
 
 Until then, install directly from the official Adspirer repository:
@@ -19,12 +18,15 @@ Until then, install directly from the official Adspirer repository:
 ```bash
 hermes plugins install Adspirer/adspirer-hermes-plugin --no-enable
 hermes plugins enable adspirer
-hermes mcp login adspirer
 ```
 
-Complete the browser-based Adspirer sign-in, then start a new Hermes session or run
-`/reload-mcp`. Connect or reconnect advertising accounts at
+Start a new Hermes session or run `/reload-mcp`. The first connection opens a browser for Adspirer
+sign-in; complete the authorization and return to Hermes. Connect or reconnect advertising accounts at
 [adspirer.ai/connections](https://adspirer.ai/connections).
+
+The plugin requires Node.js 20.18.1 or newer with `npx` available on `PATH`. Hermes launches the
+exactly pinned `mcp-remote@0.1.49` package as a local stdio-to-HTTP OAuth bridge; no global npm
+installation is required.
 
 ## Try it
 
@@ -56,10 +58,10 @@ data.
 
 ## Included components
 
-- One Streamable HTTP MCP server: `https://mcp.adspirer.com/mcp`
+- One stdio MCP entry backed by the hosted Streamable HTTP server at `https://mcp.adspirer.com/mcp`
 - Fourteen advertising and campaign-management skills
 - OAuth 2.1 authorization with PKCE and dynamic client registration
-- No local executable, bootstrap script, hook, native tool, or self-updater
+- An exact `mcp-remote@0.1.49` runtime pin; no bootstrap script, hook, native tool, or self-updater
 
 The package follows the published
 [Agent Plugins v1 specification](https://agent-plugins.org/specification). Hermes discovers the
@@ -86,13 +88,16 @@ root `plugin.json`, `mcp.json`, and immediate child directories under `skills/`.
 
 ## Authentication
 
-The plugin intentionally stores no credentials in `mcp.json`. When the hosted server returns an
-authorization challenge, Hermes discovers Adspirer's OAuth metadata and manages the browser login,
-PKCE exchange, refresh tokens, and local token storage. Reauthorize at any time with:
+The plugin intentionally stores no credentials in `mcp.json`. On first connection, the pinned
+`mcp-remote` bridge discovers Adspirer's OAuth metadata, opens the browser login, completes the PKCE
+exchange, and stores the resulting tokens locally in `~/.mcp-auth/mcp-remote-0.1.49/`. To
+reauthorize, remove only the Adspirer entry from that versioned token directory and run
+`/reload-mcp`, or use the Hermes connector UI when available.
 
-```bash
-hermes mcp login adspirer
-```
+Why a bridge? Agent Plugins v1 does not have a portable field for declaring OAuth on a remote MCP
+entry. Hermes supports OAuth for native MCP configuration, but its portable plugin translator cannot
+currently carry that setting. The pinned bridge preserves one-command plugin installation while
+using Adspirer's hosted server and standards-based OAuth flow.
 
 ## Scheduled reviews
 
@@ -109,9 +114,8 @@ Validate the package with the same admission command used by the Hermes catalog:
 hermes plugins validate .
 ```
 
-Before releasing, test installation from a clean Hermes profile, complete
-`hermes mcp login adspirer`, confirm all fourteen skills load, and run at least one read-only MCP
-call.
+Before releasing, test installation from a clean Hermes profile, complete the browser login triggered
+by the first MCP connection, confirm all fourteen skills load, and run at least one read-only MCP call.
 
 ## Support and security
 
