@@ -1,0 +1,33 @@
+name: Validate Hermes plugin
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+
+      - name: Validate JSON
+        run: |
+          jq -e . plugin.json >/dev/null
+          jq -e . mcp.json >/dev/null
+
+      - name: Validate with Hermes
+        uses: NousResearch/hermes-agent/.github/actions/plugin-validate@8a92051f20e6b371c4ff1a46a5bcec7138cc4e8c
+        with:
+          path: .
+          hermes-ref: 8a92051f20e6b371c4ff1a46a5bcec7138cc4e8c
+
+      - name: Reject client-specific setup instructions
+        run: |
+          if grep -RniE 'Cursor Settings|\.cursor/' skills; then
+            echo "Client-specific instructions found in portable skills"
+            exit 1
+          fi
