@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 
 ## 1.0.1 - 2026-09-28
 
-- Replace `assets/icon.png` with the Adspirer AD mark at 512×512 (was 146×146).
+- Replace the listing icon with the Adspirer brand square logo (640×640; was a 146×146 image).
 
 ## 1.0.0 - 2026-09-19
 
