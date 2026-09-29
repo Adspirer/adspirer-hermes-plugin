@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## 1.0.1 - 2026-09-28
+
+- Replace the listing icon with the Adspirer brand square logo (640×640; was a 146×146 image).
+
 ## 1.0.0 - 2026-09-19
 
 - Initial Hermes Agent distribution with fourteen paid-media workflow skills.
