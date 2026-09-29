@@ -1,7 +1,7 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "adspirer",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Create, analyze, and optimize advertising campaigns across Google Ads, Meta Ads, TikTok Ads, LinkedIn Ads, Amazon Ads, and ChatGPT Ads.",
   "author": {
     "name": "Adspirer",
