@@ -2,7 +2,7 @@
 
 Create, analyze, and optimize paid-media campaigns from Hermes Agent. This portable Agent Plugins
 v1 package connects Hermes to Adspirer's hosted MCP service and includes workflow skills for Google
-Ads, Meta Ads, TikTok Ads, LinkedIn Ads, Amazon Ads, and ChatGPT Ads.
+Ads, Meta Ads, TikTok Ads, LinkedIn Ads, Amazon Ads, ChatGPT Ads, and Microsoft Advertising.
 
 ## Install
 
@@ -59,7 +59,7 @@ data.
 ## Included components
 
 - One stdio MCP entry backed by the hosted Streamable HTTP server at `https://mcp.adspirer.com/mcp`
-- Fourteen advertising and campaign-management skills
+- Twenty-four advertising and campaign-management skills
 - OAuth 2.1 authorization with PKCE and dynamic client registration
 - An exact `mcp-remote@0.1.49` runtime pin; no bootstrap script, hook, native tool, or self-updater
 
@@ -85,6 +85,16 @@ root `plugin.json`, `mcp.json`, and immediate child directories under `skills/`.
 | `adspirer-amazon-ads` | Amazon Ads campaign guidance |
 | `adspirer-chatgpt-ads` | ChatGPT Ads campaign guidance |
 | `adspirer-docs` | Adspirer product, plan, connection, and troubleshooting documentation |
+| `adspirer-microsoft-ads` | Microsoft Advertising campaign guidance |
+| `adspirer-keywords` | Keyword research, match types, search terms, and negatives |
+| `adspirer-competitors` | Competitors' public ads: offers, formats, and landing pages |
+| `adspirer-google-analytics` | Google Analytics 4 data for paid-media decisions |
+| `adspirer-search-console` | Google Search Console data for paid search |
+| `adspirer-tag-manager` | Google Tag Manager inspection for conversion-tracking checks |
+| `adspirer-dashboard` | A visual cross-platform dashboard |
+| `adspirer-digest` | Email or Slack digests, sent only after the user approves |
+| `adspirer-ads-manager-sign-in` | The user signs in to an ads manager in the agent's browser themselves |
+| `adspirer-ads-manager-browser` | Read-only checks in an ad platform's own web UI |
 
 ## Authentication
 
@@ -108,6 +118,12 @@ the recommended default for performance reviews.
 
 ## Development
 
+This repository is generated. The source is `plugins/hermes` in
+[amekala/ads-mcp](https://github.com/amekala/ads-mcp), where the skills are built from the same
+shared templates as every other Adspirer host, and a scheduled workflow here copies it over. Send
+changes to ads-mcp; edits made directly here are overwritten by the next sync.
+
+
 Validate the package with the same admission command used by the Hermes catalog:
 
 ```bash
@@ -115,7 +131,7 @@ hermes plugins validate .
 ```
 
 Before releasing, test installation from a clean Hermes profile, complete the browser login triggered
-by the first MCP connection, confirm all fourteen skills load, and run at least one read-only MCP call.
+by the first MCP connection, confirm all twenty-four skills load, and run at least one read-only MCP call.
 
 ## Support and security
 

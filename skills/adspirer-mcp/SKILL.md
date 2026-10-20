@@ -5,9 +5,10 @@ description: How to call the Adspirer MCP hub correctly — the router two-step 
 
 # Calling the Adspirer MCP hub
 
-Adspirer exposes **20 top-level tools**. Six of them are *routers* that stand in front of
-hundreds of platform tools. Calling a platform tool by its own name does not work — it is not in
-the tool list. Read this before your first tool call.
+Adspirer exposes a small set of **top-level tools**. Platform and product tools sit behind
+*routers*. Calling a platform tool by its own name does not work — it is not in the tool list.
+Read this before your first tool call. The live list wins over the names below: `list_tools` and
+`get_tool_schema` are free.
 
 ## The tool surface
 
@@ -23,13 +24,22 @@ the tool list. Read this before your first tool call.
 | `switch_primary_account` | Change which account is active. |
 | `get_campaign_performance` | Google Ads performance. |
 | `get_meta_campaign_performance` | Meta (Facebook/Instagram) performance. |
-| `audit_conversion_tracking` | Conversion-tracking health across platforms. |
+| `audit_conversion_tracking` | Conversion-tracking health for Google, Meta, and LinkedIn. Not Microsoft. |
+| `diagnose_funnel` | Where a conversion path breaks, read-only. Stops at the first broken step. |
+| `competitor_ads_research` | Public competitor ads. Not on the Free plan. |
 | `echo_test` | Connectivity check. Free. |
 
 **These are routers.** Never call their inner tools by name:
 
-`google_ads` · `meta_ads` · `linkedin_ads` · `tiktok_ads` · `amazon_ads` · `chatgpt_ads` ·
-`monitoring_and_reporting` · `community_plugins` · `google_analytics` · `klaviyo`
+`google_ads` · `meta_ads` · `linkedin_ads` · `tiktok_ads` · `amazon_ads` · `microsoft_ads` ·
+`chatgpt_ads` · `monitoring_and_reporting` · `community_plugins`
+
+These appear only when that product is connected:
+
+`google_analytics` · `google_search_console` · `google_tag_manager` · `klaviyo`
+
+Another product router may show up the same way. If you don't see it, it isn't connected — say so
+and point the user at `https://adspirer.ai/connections`. Don't insist the tool exists.
 
 ## The router two-step
 
@@ -58,8 +68,10 @@ Returns every tool on that platform with its full parameter schema.
 - `action: "execute"` without a `tool_name` is **invalid**. It returns an error. **Do not retry
   the same call** — go back to `list_tools` and read the real tool name.
 - Never pass a platform tool name as `action`. `action` is only ever `"list_tools"` or `"execute"`.
-- `search_tools` and `get_tool_schema` are **top-level**. Never wrap them in `action: "execute"`,
-  and never route them through a platform tool. They are not platform-specific.
+- `search_tools` and `get_tool_schema` are **top-level**. Call them directly when they are in
+  your tool list. If your client does not list `get_tool_schema`, call it through any platform
+  router: `google_ads` with `action: "execute"`, `tool_name: "get_tool_schema"`,
+  `arguments: {"tool_names": [...]}`. It returns the same schema. Never stop because it is missing.
 - Never guess a tool name or a parameter. If you are unsure, call `list_tools` or `get_tool_schema`.
 
 ## Finding the right tool
@@ -67,9 +79,8 @@ Returns every tool on that platform with its full parameter schema.
 When you don't know which tool does the job:
 
 1. `search_tools` with a natural-language description of the task.
-2. `get_tool_schema` with the candidate names **and** `intent` set to the user's complete request,
-   word for word. Not a summary, not a paraphrase. Pass it every time — it is how tool discovery
-   improves.
+2. `get_tool_schema` with the candidate names to get their exact parameters. Not in your tool
+   list? Call it through a router (see Rules above).
 3. Call the tool: directly if it's in the direct list above, otherwise through its router with
    `action: "execute"`.
 
@@ -107,12 +118,28 @@ The parameter name differs per platform:
 | TikTok Ads | `advertiser_id` |
 | LinkedIn Ads | `account_id` |
 | Amazon Ads | `profile_id` |
+| Microsoft Advertising | `account_id` |
 | ChatGPT Ads | `account_id` |
 
 Send IDs as **strings**, not numbers. Naming an account the user has not connected returns a 403 —
 it never quietly falls back to another account, so do not treat 403 as "try again without the id."
 
 Use `get_connections_status` to see what is connected.
+
+### Conversion-tracking audit
+
+`audit_conversion_tracking` is direct. Send `platform` and the account id as a string
+(`customer_id` on Google). `lookback_days` is 7, 14, 30, 60, or 90. It covers Google, Meta, and
+LinkedIn — not Microsoft. It looks back from today, not over whatever history a performance read
+cached. If that window had no delivery, "no conversions" is not proof the tag is broken. Say the
+window had no delivery.
+
+With more than one Google Ads account connected, the tool can ignore `customer_id` and answer
+"You have N google_ads accounts connected. Please specify..." anyway. Retry the same call once.
+If it fails the same way, don't keep retrying. See the error catalog.
+
+Switching the primary account (`switch_primary_account`) changes which account later calls treat
+as active. That needs its own yes. It is not something you do silently to make an audit run.
 
 ## Quota
 
@@ -130,9 +157,11 @@ around a quota error or invent the data.
 
 ## Tools that may not be there
 
-`google_analytics` and `klaviyo` appear only when the user has connected that service. If you don't
-see the tool, the connection is missing — say so and point them at
-`https://adspirer.ai/connections`. Don't insist the tool exists.
+`google_analytics`, `google_search_console`, `google_tag_manager`, and `klaviyo` appear only when
+that product is connected. If you don't see the router, the connection is missing — say so and
+point them at `https://adspirer.ai/connections`. Don't insist the tool exists. `microsoft_ads` is
+a platform router like Google and Meta; a missing performance or keyword tool *inside* it is a
+catalog gap, not a missing connection. `adspirer-microsoft-ads` describes that gap.
 
 ## When something fails
 

@@ -13,8 +13,10 @@ router, read the real tool name, then execute.
 You called a platform tool at the top level. Only the ten direct tools can be called by name;
 everything else goes through its router with `action: "execute"`. See the tool table in `SKILL.md`.
 
-**`search_tools` or `get_tool_schema` returned "Tool not found"**
-You wrapped them in `action: "execute"`. Both are top-level. Call them directly.
+**`get_tool_schema` is not in your tool list**
+Some clients (the ChatGPT app, some uploaded skill kits) do not list it. Call it through any
+platform router instead: `google_ads` with `action: "execute"`, `tool_name: "get_tool_schema"`,
+`arguments: {"tool_names": [...]}`. It returns the same schema. Never stop because it is missing.
 
 ## Account errors
 
@@ -83,6 +85,15 @@ Meta campaign creation is rate-guarded per user (100/hr, 300/day). Updates and p
 limited. If a write is blocked, stop — do not retry in a loop.
 
 ## Google
+
+**`audit_conversion_tracking` says "You have N google_ads accounts connected. Please specify..." even though you sent `customer_id`**
+Known bug ([amekala/ads-mcp#41](https://github.com/amekala/ads-mcp/issues/41)). With more than one
+Google Ads account connected, the audit ignores `customer_id` and returns that message. Retry the
+same call once. If it comes back the same, stop. Either ask the user and call
+`switch_primary_account` for the account they name — that changes which account later calls treat
+as active, so confirm first — or read the conversion actions in the Google Ads UI
+(`adspirer-ads-manager-browser`). Do not keep retrying, and do not treat the message as proof that
+tracking is broken.
 
 **"Asset bundle expired"**
 Bundles from `validate_and_prepare_assets` live for **1 hour**. Re-run it and use the fresh bundle.

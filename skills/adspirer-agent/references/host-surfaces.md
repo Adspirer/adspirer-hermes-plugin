@@ -1,51 +1,67 @@
 # Hermes surfaces: scheduled work and delivery
 
-Use Hermes features only when they genuinely improve the advertising workflow. Do the requested
-analysis first; scheduling and presentation come after the answer.
+Your host may offer ways to show work and repeat work that the terminal or the chat transcript
+can't. Use them when they genuinely fit. Don't announce a capability the host doesn't have.
 
-## Scheduled work
+## Anything recurring: use the host's scheduler when it has one
 
-Hermes exposes scheduled tasks through the `cronjob` tool. It can create, list, pause, resume, edit,
-run, and remove one-time or recurring jobs.
+**If the host can schedule work, schedule it there.** The user gets one place to see, pause, and edit
+everything they've automated, and the result lands where they already are — in the conversation, with
+a notification. Offer to set it up rather than describing the UI; on both hosts the user can create a
+task just by asking.
 
-Good advertising uses include:
+Use it for anything on a cadence: a Monday performance review, a mid-month pacing check, a watch on a
+competitor's landing page, a nudge before a budget resets.
 
-- a weekly cross-platform performance review;
-- a mid-month budget-pacing check;
-- a recurring check for disapproved ads; and
-- an alert when CPA or spend crosses a user-approved threshold.
+### Hermes: the `cronjob` tool
 
-When creating a scheduled advertising task:
+Hermes schedules work through its `cronjob` tool. It can create, list, pause, resume, edit, run, and
+remove one-time or recurring jobs. When creating a scheduled advertising task:
 
 1. Attach the relevant Adspirer skill.
-2. Set the brand project's absolute work directory so the run can read `BRAND.md` and `STRATEGY.md`.
+2. Set the brand project's absolute work directory so the run can read `BRAND.md` and
+   `STRATEGY.md`.
 3. Name the connected Adspirer MCP toolset when the Hermes surface exposes toolset selection.
-4. Prefer creating the job paused when the prompt could write to an ad account; let the user review
-   it before enabling recurring execution.
-5. State that every run consumes Adspirer tool calls like an interactive session.
+4. Create the job paused when the prompt could write to an ad account, and let the user review it
+   before enabling it.
 
-Weekly is the normal default for a performance review. Daily is appropriate only when the account's
-spend and risk justify the additional calls. `get_usage_status` is free and shows remaining quota.
+Schedule read-only reporting and monitoring by default. A scheduled run must not make unattended
+budget, bid, launch, archive, or deletion changes.
 
-Scheduled runs must not make unattended budget, bid, launch, archive, or deletion changes. Schedule
-read-only reporting and monitoring by default. If the user needs server-side monitoring that runs
-independently of their Hermes gateway, use Adspirer's `monitoring_and_reporting` router instead.
+Hermes cron results can go back to the originating conversation, to a local file, or to a configured
+messaging destination. Ad spend, performance, customer lists, and lead-form submissions are
+confidential: confirm the destination before sending client data outside the local session.
 
-## Delivery and privacy
+If a scheduled run can't reach Adspirer, it reports the connection error and never invents metrics.
+If the job can't read the brand workspace, fix its work directory rather than rebuilding brand
+context from guesses.
 
-Hermes cron results can return to the originating conversation, a local file, or a configured
-messaging destination. Advertising performance, spend, customer lists, and lead-form submissions
-are confidential. Confirm the destination before sending client data outside the current local
-session.
+Adspirer also has its own server-side monitors and email briefs, under the
+`monitoring_and_reporting` router — threshold alerts on ROAS, CPA, spend and CTR, scheduled reports,
+and async research jobs. Reach for those when the host has **no** scheduler at all (a plain CLI), when
+the user wants the report to arrive as **email** rather than in a chat, or when they want an alert to
+keep firing after they stop using this assistant. Otherwise prefer the host.
 
-If the user wants an email brief or a persistent threshold alert, Adspirer's server-side monitoring
-tools are the better fit. Discover them with `{"action": "list_tools"}` on the
-`monitoring_and_reporting` router.
+Discovery on that router is free — `{"action": "list_tools"}` — as are `list_monitors`,
+`list_scheduled_tasks`, `get_monitor_history`, and `test_monitor`.
 
-## Failure behavior
 
-- If the Adspirer MCP connection is unavailable, do not invent metrics; report the connection error.
-- If authentication expired, ask the user to run `hermes mcp login adspirer`.
-- If the scheduled job lacks access to the brand workspace, update it with the correct absolute work
-  directory instead of recreating brand context from guesses.
-- If quota is exhausted, say where the run stopped and what remains.
+## What a scheduled run costs
+
+A scheduled task re-runs the work, which means it calls Adspirer tools again — every run draws on the
+user's monthly tool-call quota exactly like a live conversation. A daily review costs roughly thirty
+times what a monthly one does.
+
+Pick a cadence the plan can carry, and say what it will cost in calls before setting it up. Weekly is
+the right default for a performance review; daily is for accounts spending enough to justify it.
+`get_usage_status` is free and shows what's left.
+
+---
+
+## How to offer, without overselling
+
+1. **Do the work first.** The answer comes before the packaging.
+2. **Offer the surface when it earns its place** — comparison, a chart, something the user will
+   revisit or send to someone.
+3. **Ask before publishing anything that leaves the conversation.** A shared page is outward-facing.
+4. **If the host can't do it, say so once and move on.** A markdown table is a fine answer.
